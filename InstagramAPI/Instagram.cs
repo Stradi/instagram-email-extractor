@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using InstagramAPI.Proxy;
 using InstagramAPI.Models;
@@ -19,12 +20,21 @@ namespace InstagramAPI {
       httpClient = new HttpClient(httpHandler);
     }
 
-    public Task<HttpResponseMessage> GetRequestAsync(GetRequest request) {      
-      return httpClient.GetAsync(request.ToString());
-    }
+    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential) {
+      HttpMethod method = null;
+      if(request.requestType == RequestType.GET) {
+        method = HttpMethod.Get;
+      } else {
+        method = HttpMethod.Post;
+      }
 
-    public Task<HttpResponseMessage> PostRequestAsync(PostRequest request) {
-      return httpClient.PostAsync(request.ToString(), request.Data);
+      HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
+      HttpResponseMessage response = await httpClient.SendAsync(req);
+      credential.IncreaseRequestCount();
+      credential.SetCookies(httpHandler.CookieContainer);
+      
+      //TODO: Return Custom Response according to status code..
+      return response;
     }
   }
 }
