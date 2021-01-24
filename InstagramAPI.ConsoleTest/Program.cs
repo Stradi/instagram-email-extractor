@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using InstagramAPI.Models;
+using InstagramAPI.Requests;
 
 namespace InstagramAPI.ConsoleTest {
   class Program {
@@ -16,7 +17,18 @@ namespace InstagramAPI.ConsoleTest {
 
       Instagram ig = new Instagram(proxies);
 
-      HttpResponseMessage resp = await ig.SendGetRequest("https://httpbin.org/ip");
+      GetRequest r = new GetRequest(
+        "https://httpbin.org/get",
+        new RequestParams() { name = "Name1", value = "Value1" },
+        new RequestParams() { name = "Name2", value = "Value2" }
+      );
+
+      PostRequest pr = new PostRequest(
+        "https://httpbin.org/post",
+        new StringContent("{\"data\": \"value\"}")
+      );
+
+      HttpResponseMessage resp = await ig.PostRequestAsync(pr);
       Console.WriteLine(await resp.Content.ReadAsStringAsync());
     }
   }

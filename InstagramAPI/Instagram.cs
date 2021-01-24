@@ -4,6 +4,7 @@ using System.Net.Http;
 
 using InstagramAPI.Proxy;
 using InstagramAPI.Models;
+using InstagramAPI.Requests;
 
 namespace InstagramAPI {
   public class Instagram {
@@ -12,12 +13,18 @@ namespace InstagramAPI {
 
     public Instagram(List<ProxyModel> proxies = null) {
       httpHandler = new HttpClientHandler();
-      httpHandler.Proxy = new RotatingWebProxy(proxies);
+      if(proxies != null) {
+        httpHandler.Proxy = new RotatingWebProxy(proxies);
+      }
       httpClient = new HttpClient(httpHandler);
     }
 
-    public Task<HttpResponseMessage> SendGetRequest(string url) {      
-      return httpClient.GetAsync(url);
+    public Task<HttpResponseMessage> GetRequestAsync(GetRequest request) {      
+      return httpClient.GetAsync(request.ToString());
+    }
+
+    public Task<HttpResponseMessage> PostRequestAsync(PostRequest request) {
+      return httpClient.PostAsync(request.ToString(), request.Data);
     }
   }
 }
