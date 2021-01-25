@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using InstagramAPI.Proxy;
 using InstagramAPI.Models;
@@ -25,7 +26,39 @@ namespace InstagramAPI {
       httpClient = new HttpClient(httpHandler);
     }
 
-    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential) {
+    //TODO: Create Response classes for each response.
+    public async Task<HttpResponseMessage> LoginAsync(CredentialModel credential) {
+      if(credential.IsLoggedIn) {
+        return null;
+      }
+      
+      HttpResponseMessage indexPage = await SendRequestAsync(new GetRequest(Constants.LOGIN_URL), credential);
+      
+      string rolloutHash = GetRolloutHash(await indexPage.Content.ReadAsStringAsync());
+      
+      RequestHeader rolloutHashHeader = new RequestHeader {
+        name = "x-instagram-ajax",
+        value = rolloutHash
+      };
+      
+      string[] encHeaders = GetPasswordEncryptionHeaders(indexPage);
+      string encryptedPassword = Helpers.GenerateEncPassword(credential.password, encHeaders[2], encHeaders[0], encHeaders[1]);
+
+      //Login procedure.
+      FormUrlEncodedContent postContent = new FormUrlEncodedContent(new [] {
+        new KeyValuePair<string, string>("username", credential.username),
+        new KeyValuePair<string, string>("enc_password", encryptedPassword)
+      });
+      
+      HttpResponseMessage loginResponse = await SendRequestAsync(
+        new PostRequest(Constants.LOGIN_POST_URL, postContent),
+        credential,
+        rolloutHashHeader);
+
+      return loginResponse;
+    }
+
+    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential, params RequestHeader[] additionalHeaders) {      
       HttpMethod method = null;
       if(request.requestType == RequestType.GET) {
         method = HttpMethod.Get;
@@ -38,6 +71,18 @@ namespace InstagramAPI {
       }
 
       HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
+      if(request.requestType == RequestType.POST) {
+        PostRequest p = (PostRequest)request;
+        req.Content = p.Data;
+      }
+
+      SetHeaders(ref req, credential);
+      if(additionalHeaders.Length != 0) {
+        for(int i = 0; i < additionalHeaders.Length; i++) {
+          AddHeader(ref req, additionalHeaders[i]);
+        }
+      }
+
       HttpResponseMessage response = await httpClient.SendAsync(req);
       credential.IncreaseRequestCount();
 
@@ -55,6 +100,35 @@ namespace InstagramAPI {
         .Cast<Cookie>()
         .ToList()
         .ForEach(c => c.Expired = true);
+    }
+
+    public string[] GetPasswordEncryptionHeaders(HttpResponseMessage response) {
+      string[] encryptionHeaders = new string[3]; 
+      
+      string keyId = response.Headers.GetValues("ig-set-password-encryption-web-key-id").First();
+      string keyVersion = response.Headers.GetValues("ig-set-password-encryption-web-key-version").First();
+      string publicKey = response.Headers.GetValues("ig-set-password-encryption-web-pub-key").First();
+
+      encryptionHeaders[0] = keyId;
+      encryptionHeaders[1] = keyVersion;
+      encryptionHeaders[2] = publicKey;
+
+      return encryptionHeaders;
+    }
+
+    private void SetHeaders(ref HttpRequestMessage request, CredentialModel credential) {
+      //TODO: Assign random user agent to each credential..
+      AddHeader(ref request, new RequestHeader() { name = "x-ig-appid", value = Constants.IG_APPID });
+      AddHeader(ref request, new RequestHeader() { name = "x-requested-with", value = "XMLHttpRequest" });
+      AddHeader(ref request, new RequestHeader() { name = "x-csrftoken", value = credential.GetCsrfToken() });
+    }
+
+    private void AddHeader(ref HttpRequestMessage request, RequestHeader header) {
+      request.Headers.Add(header.name, header.value);
+    }
+
+    private string GetRolloutHash(string html) {
+      return Regex.Match(html, "/\"rollout_hash\":\"([^\"]*\")/g").Groups[0].Value;
     }
   }
 }

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace InstagramAPI.Models {
   public class CredentialModel {
@@ -7,14 +8,19 @@ namespace InstagramAPI.Models {
     public string password;
     public CookieContainer cookies;
 
-    private int totalRequests;
     public int TotalRequests { get { return totalRequests; } }
+    private int totalRequests;
+    
+    public bool IsLoggedIn { get { return isLoggedIn; } set { isLoggedIn = value; } }
+    private bool isLoggedIn;
 
     public CredentialModel(string username, string password) {
       this.username = username;
       this.password = password;
       this.cookies = null;
       this.totalRequests = 0;
+
+      this.isLoggedIn = false;
     }
 
     public void SetCookies(CookieContainer cookies) {
@@ -34,7 +40,7 @@ namespace InstagramAPI.Models {
         .FirstOrDefault(x => x.Name == "csrftoken");
 
       if(csrf == null) {
-        return "CSRF is NULL";
+        return null;
       }
 
       return csrf.Value;

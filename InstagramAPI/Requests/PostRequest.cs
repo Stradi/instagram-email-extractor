@@ -2,14 +2,14 @@ using System.Net.Http;
 
 namespace InstagramAPI.Requests {
   public class PostRequest : BaseRequest {
-    private StringContent content;
-    public StringContent Data {
+    private FormUrlEncodedContent content;
+    public FormUrlEncodedContent Data {
       get {
         return content;
       }
     }
     
-    public PostRequest(string url, StringContent content, params RequestParams[] parameters) : base(url, RequestType.POST, parameters) {
+    public PostRequest(string url, FormUrlEncodedContent content, params RequestParams[] parameters) : base(url, RequestType.POST, parameters) {
       this.content = content;
     }
   }
