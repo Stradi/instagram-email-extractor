@@ -27,13 +27,17 @@ namespace InstagramAPI.Models {
       this.totalRequests++;
     }
 
-    public string GetCsrfToken(string url) {
+    public string GetCsrfToken() {
       if(cookies == null) {
         return null;
       }
 
-      Cookie csrf = cookies.GetCookies(new System.Uri(url)).Cast<Cookie>()
+      Cookie csrf = cookies.GetCookies(new System.Uri(Constants.BASE_URL)).Cast<Cookie>()
         .FirstOrDefault(x => x.Name == "csrftoken");
+
+      if(csrf == null) {
+        return "CSRF is NULL";
+      }
 
       return csrf.Value;
     }

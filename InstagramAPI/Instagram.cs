@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -31,10 +32,21 @@ namespace InstagramAPI {
       HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
       HttpResponseMessage response = await httpClient.SendAsync(req);
       credential.IncreaseRequestCount();
-      credential.SetCookies(httpHandler.CookieContainer);
-      
+
+      CookieContainer cookieContainer = Helpers.CloneCookieContainer(httpHandler.CookieContainer, Constants.BASE_URL);
+      credential.SetCookies(cookieContainer);
+
+      ClearCookieContainer();
+
       //TODO: Return Custom Response according to status code..
       return response;
+    }
+
+    private void ClearCookieContainer() {
+      httpHandler.CookieContainer.GetCookies(new System.Uri(Constants.BASE_URL))
+        .Cast<Cookie>()
+        .ToList()
+        .ForEach(c => c.Expired = true);
     }
   }
 }
