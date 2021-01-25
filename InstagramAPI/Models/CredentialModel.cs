@@ -18,9 +18,7 @@ namespace InstagramAPI.Models {
     }
 
     public void SetCookies(CookieContainer cookies) {
-      if(this.cookies == null) {
-        this.cookies = cookies;
-      }
+      this.cookies = cookies;
     }
 
     public void IncreaseRequestCount() {

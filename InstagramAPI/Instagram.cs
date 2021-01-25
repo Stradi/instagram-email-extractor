@@ -11,10 +11,14 @@ using InstagramAPI.Requests;
 namespace InstagramAPI {
   public class Instagram {
     private HttpClient httpClient;
+
+    private CookieContainer cookieContainer;
     private HttpClientHandler httpHandler;
 
     public Instagram(List<ProxyModel> proxies = null) {
       httpHandler = new HttpClientHandler();
+      cookieContainer = new CookieContainer();
+      httpHandler.CookieContainer = cookieContainer;
       if(proxies != null) {
         httpHandler.Proxy = new RotatingWebProxy(proxies);
       }
@@ -29,12 +33,16 @@ namespace InstagramAPI {
         method = HttpMethod.Post;
       }
 
+      if(credential.cookies != null) {
+        cookieContainer = credential.cookies;
+      }
+
       HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
       HttpResponseMessage response = await httpClient.SendAsync(req);
       credential.IncreaseRequestCount();
 
-      CookieContainer cookieContainer = Helpers.CloneCookieContainer(httpHandler.CookieContainer, Constants.BASE_URL);
-      credential.SetCookies(cookieContainer);
+      CookieContainer copyCookies = Helpers.CloneCookieContainer(cookieContainer, Constants.BASE_URL);
+      credential.SetCookies(copyCookies);
 
       ClearCookieContainer();
 
@@ -43,7 +51,7 @@ namespace InstagramAPI {
     }
 
     private void ClearCookieContainer() {
-      httpHandler.CookieContainer.GetCookies(new System.Uri(Constants.BASE_URL))
+      cookieContainer.GetCookies(new System.Uri(Constants.BASE_URL))
         .Cast<Cookie>()
         .ToList()
         .ForEach(c => c.Expired = true);
