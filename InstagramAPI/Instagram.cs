@@ -52,7 +52,7 @@ namespace InstagramAPI {
       return loginResponse;
     }
 
-    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential) {      
+    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential = null) {      
       HttpMethod method = null;
       if(request.requestType == RequestType.GET) {
         method = HttpMethod.Get;
@@ -60,11 +60,8 @@ namespace InstagramAPI {
         method = HttpMethod.Post;
       }
 
-      if(credential.cookies != null) {
-        cookieContainer = credential.cookies;
-      }
-
       HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
+
       if(request.requestType == RequestType.POST) {
         PostRequest p = (PostRequest)request;
         req.Content = p.GetData();
@@ -76,12 +73,19 @@ namespace InstagramAPI {
           AddHeader(ref req, request.additionalHeaders[i]);
         }
       }
+      
+      if(credential.cookies != null) {
+        cookieContainer = credential.cookies;
+      }
 
       HttpResponseMessage response = await httpClient.SendAsync(req);
-      credential.IncreaseRequestCount();
 
-      CookieContainer copyCookies = Helpers.CloneCookieContainer(cookieContainer, Constants.BASE_URL);
-      credential.SetCookies(copyCookies);
+      if(credential != null) {
+        CookieContainer copyCookies = Helpers.CloneCookieContainer(cookieContainer, Constants.BASE_URL);
+    
+        credential.IncreaseRequestCount();
+        credential.SetCookies(copyCookies);
+      }
 
       ClearCookieContainer();
 
@@ -111,7 +115,7 @@ namespace InstagramAPI {
       AddHeader(ref request, new RequestHeader() { name = "x-ig-appid", value = Constants.IG_APPID });
       AddHeader(ref request, new RequestHeader() { name = "x-requested-with", value = "XMLHttpRequest" });
 
-      if(credential.GetCsrfToken() != null) {
+      if(credential != null && credential.GetCsrfToken() != null) {
         AddHeader(ref request, new RequestHeader() { name = "x-csrftoken", value = credential.GetCsrfToken() });
       }
     }
