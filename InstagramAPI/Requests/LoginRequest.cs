@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 
 using InstagramAPI.Models;
+using InstagramAPI.Helpers;
 
 namespace InstagramAPI.Requests {
   public struct LoginRequestParams {
@@ -33,7 +34,7 @@ namespace InstagramAPI.Requests {
 
     public string GetEncryptedPassword() {
       if(string.IsNullOrWhiteSpace(encryptedPassword)) {
-        encryptedPassword = Helpers.GenerateEncPassword(
+        encryptedPassword = PasswordHelper.GenerateEncPassword(
           loginRequestParams.credential.password,
           loginRequestParams.passwordEncryptionValues.publicKey,
           loginRequestParams.passwordEncryptionValues.keyId,

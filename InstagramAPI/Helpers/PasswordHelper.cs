@@ -1,29 +1,12 @@
-using System.Net;
-using System.Text.Json;
+using System;
+using System.Text;
+using System.Linq;
+using System.Security.Cryptography;
 
 using Sodium;
-using System.Security.Cryptography;
-using System;
-using System.Linq;
-using System.Text;
 
-namespace InstagramAPI {
-  public static class Helpers {
-    public static string SerializeCookieContainer(CookieContainer cookieContainer) {
-      return JsonSerializer.Serialize(cookieContainer, typeof(CookieContainer));
-    }
-
-    public static CookieContainer DeserializeCookieContainer(string serialized) {
-      return (CookieContainer)JsonSerializer.Deserialize(serialized, typeof(CookieContainer));
-    }
-
-    public static CookieContainer CloneCookieContainer(CookieContainer original, string url) {
-      CookieContainer newCookieContainer = new CookieContainer();
-      newCookieContainer.Add(original.GetCookies(new System.Uri(url)));
-
-      return newCookieContainer;
-    }
-
+namespace InstagramAPI.Helpers {
+  public static class PasswordHelper {
     public static string GenerateEncPassword(string password, string publicKey, string keyId, string version) {
       var time = DateTime.UtcNow.ToTimestamp(); // Unix timestamp
       var keyBytes = publicKey.HexToBytes(); // Convert a hex string to a byte array

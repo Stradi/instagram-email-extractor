@@ -7,7 +7,9 @@ using System.Text.RegularExpressions;
 
 using InstagramAPI.Proxy;
 using InstagramAPI.Models;
+using InstagramAPI.Helpers;
 using InstagramAPI.Requests;
+using InstagramAPI.Responses;
 
 namespace InstagramAPI {
   public class Instagram {
@@ -27,7 +29,7 @@ namespace InstagramAPI {
     }
 
     //TODO: Create Response classes for each response.
-    public async Task<HttpResponseMessage> LoginAsync(CredentialModel credential) {
+    public async Task<LoginResponse> LoginAsync(CredentialModel credential) {
       if(credential.IsLoggedIn) {
         return null;
       }
@@ -48,8 +50,10 @@ namespace InstagramAPI {
       LoginRequest loginRequest = new LoginRequest(loginRequestParams, Constants.LOGIN_POST_URL);
       
       HttpResponseMessage loginResponse = await SendRequestAsync(loginRequest, credential);
+      LoginResponse response = new LoginResponse();
+      response.ConvertFromJSON(await loginResponse.Content.ReadAsStringAsync());
 
-      return loginResponse;
+      return response;
     }
 
     public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential = null) {      
@@ -81,7 +85,7 @@ namespace InstagramAPI {
       HttpResponseMessage response = await httpClient.SendAsync(req);
 
       if(credential != null) {
-        CookieContainer copyCookies = Helpers.CloneCookieContainer(cookieContainer, Constants.BASE_URL);
+        CookieContainer copyCookies = GenericHelper.CloneCookieContainer(cookieContainer, Constants.BASE_URL);
     
         credential.IncreaseRequestCount();
         credential.SetCookies(copyCookies);

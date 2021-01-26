@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 
 using InstagramAPI.Models;
-using InstagramAPI.Requests;
+using InstagramAPI.Responses;
 
 namespace InstagramAPI.ConsoleTest {
   class Program {
@@ -21,8 +21,11 @@ namespace InstagramAPI.ConsoleTest {
       List<CredentialModel> credentials = new List<CredentialModel>();
       credentials.Add(new CredentialModel("", ""));
       
-      HttpResponseMessage loginResponse1 = await ig.LoginAsync(credentials[0]);
-      Console.WriteLine(await loginResponse1.Content.ReadAsStringAsync());
+      LoginResponse loginResponse = await ig.LoginAsync(credentials[0]);
+      Console.WriteLine("IsSuccessfull   : {0}", loginResponse.IsSuccessfull);
+      Console.WriteLine("IsUserExists    : {0}", loginResponse.IsUserExists);
+      Console.WriteLine("IsAuthenticated : {0}", loginResponse.IsAuthenticated);
+      Console.WriteLine("UserID          : {0}", loginResponse.UserID);
     }
   }
 }
