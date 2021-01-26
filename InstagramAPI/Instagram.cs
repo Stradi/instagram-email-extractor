@@ -72,12 +72,5 @@ namespace InstagramAPI {
 
       return response;
     }
-  
-    public async Task<string> GetUserDetails(CredentialModel credential) {
-      HttpRequestMessage req = client.CreateHttpRequestMessage(new GetRequest("https://www.instagram.com/accounts/edit/?__a=1"));
-      client.SetCookies(ref req, CookieHelper.CookieArrayToString(credential.cookies));
-      client.SetHeaders(ref req, new RequestHeader[] { new RequestHeader() { name="x-csrftoken", value=credential.GetCsrfToken() }});
-      return await (await client.SendRequestAsync(req)).Content.ReadAsStringAsync();
-    }
   }
 }
