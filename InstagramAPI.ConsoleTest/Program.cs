@@ -18,13 +18,11 @@ namespace InstagramAPI.ConsoleTest {
 
       Instagram ig = new Instagram(proxies);
 
-      GetRequest r = new GetRequest(Constants.BASE_URL);
-
       List<CredentialModel> credentials = new List<CredentialModel>();
       credentials.Add(new CredentialModel("", ""));
       
-      HttpResponseMessage loginResponse = await ig.LoginAsync(credentials[0]);
-      Console.WriteLine(await loginResponse.Content.ReadAsStringAsync());
+      HttpResponseMessage loginResponse1 = await ig.LoginAsync(credentials[0]);
+      Console.WriteLine(await loginResponse1.Content.ReadAsStringAsync());
     }
   }
 }

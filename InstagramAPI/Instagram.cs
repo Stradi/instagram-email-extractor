@@ -33,32 +33,26 @@ namespace InstagramAPI {
       }
       
       HttpResponseMessage indexPage = await SendRequestAsync(new GetRequest(Constants.LOGIN_URL), credential);
-      
-      string rolloutHash = GetRolloutHash(await indexPage.Content.ReadAsStringAsync());
-      
+
+      string rolloutHash = GetRolloutHash(await indexPage.Content.ReadAsStringAsync());      
       RequestHeader rolloutHashHeader = new RequestHeader {
         name = "x-instagram-ajax",
         value = rolloutHash
-      };
-      
-      string[] encHeaders = GetPasswordEncryptionHeaders(indexPage);
-      string encryptedPassword = Helpers.GenerateEncPassword(credential.password, encHeaders[2], encHeaders[0], encHeaders[1]);
+      };    
 
-      //Login procedure.
-      FormUrlEncodedContent postContent = new FormUrlEncodedContent(new [] {
-        new KeyValuePair<string, string>("username", credential.username),
-        new KeyValuePair<string, string>("enc_password", encryptedPassword)
-      });
+      LoginRequestParams loginRequestParams = new LoginRequestParams();
+      loginRequestParams.credential = credential;
+      loginRequestParams.rolloutHash = rolloutHashHeader;
+      loginRequestParams.passwordEncryptionValues = GetPasswordEncryptionHeaders(indexPage);;
+
+      LoginRequest loginRequest = new LoginRequest(loginRequestParams, Constants.LOGIN_POST_URL);
       
-      HttpResponseMessage loginResponse = await SendRequestAsync(
-        new PostRequest(Constants.LOGIN_POST_URL, postContent),
-        credential,
-        rolloutHashHeader);
+      HttpResponseMessage loginResponse = await SendRequestAsync(loginRequest, credential);
 
       return loginResponse;
     }
 
-    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential, params RequestHeader[] additionalHeaders) {      
+    public async Task<HttpResponseMessage> SendRequestAsync(BaseRequest request, CredentialModel credential) {      
       HttpMethod method = null;
       if(request.requestType == RequestType.GET) {
         method = HttpMethod.Get;
@@ -73,13 +67,13 @@ namespace InstagramAPI {
       HttpRequestMessage req = new HttpRequestMessage(method, request.URL);
       if(request.requestType == RequestType.POST) {
         PostRequest p = (PostRequest)request;
-        req.Content = p.Data;
+        req.Content = p.GetData();
       }
 
       SetHeaders(ref req, credential);
-      if(additionalHeaders.Length != 0) {
-        for(int i = 0; i < additionalHeaders.Length; i++) {
-          AddHeader(ref req, additionalHeaders[i]);
+      if(request.additionalHeaders.Count != 0) {
+        for(int i = 0; i < request.additionalHeaders.Count; i++) {
+          AddHeader(ref req, request.additionalHeaders[i]);
         }
       }
 
@@ -102,25 +96,24 @@ namespace InstagramAPI {
         .ForEach(c => c.Expired = true);
     }
 
-    public string[] GetPasswordEncryptionHeaders(HttpResponseMessage response) {
-      string[] encryptionHeaders = new string[3]; 
+    public PasswordEncryptionModel GetPasswordEncryptionHeaders(HttpResponseMessage response) {
+      PasswordEncryptionModel encParams = new PasswordEncryptionModel();
       
-      string keyId = response.Headers.GetValues("ig-set-password-encryption-web-key-id").First();
-      string keyVersion = response.Headers.GetValues("ig-set-password-encryption-web-key-version").First();
-      string publicKey = response.Headers.GetValues("ig-set-password-encryption-web-pub-key").First();
+      encParams.keyId = response.Headers.GetValues("ig-set-password-encryption-web-key-id").First();
+      encParams.keyVersion = response.Headers.GetValues("ig-set-password-encryption-web-key-version").First();
+      encParams.publicKey = response.Headers.GetValues("ig-set-password-encryption-web-pub-key").First();
 
-      encryptionHeaders[0] = keyId;
-      encryptionHeaders[1] = keyVersion;
-      encryptionHeaders[2] = publicKey;
-
-      return encryptionHeaders;
+      return encParams;
     }
 
     private void SetHeaders(ref HttpRequestMessage request, CredentialModel credential) {
       //TODO: Assign random user agent to each credential..
       AddHeader(ref request, new RequestHeader() { name = "x-ig-appid", value = Constants.IG_APPID });
       AddHeader(ref request, new RequestHeader() { name = "x-requested-with", value = "XMLHttpRequest" });
-      AddHeader(ref request, new RequestHeader() { name = "x-csrftoken", value = credential.GetCsrfToken() });
+
+      if(credential.GetCsrfToken() != null) {
+        AddHeader(ref request, new RequestHeader() { name = "x-csrftoken", value = credential.GetCsrfToken() });
+      }
     }
 
     private void AddHeader(ref HttpRequestMessage request, RequestHeader header) {

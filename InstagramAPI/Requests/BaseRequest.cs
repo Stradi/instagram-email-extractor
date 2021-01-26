@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace InstagramAPI.Requests {
   public enum RequestType {
     GET,
@@ -17,12 +19,16 @@ namespace InstagramAPI.Requests {
     public RequestType requestType;
      
     public string URL { get { return url; } }
+
+    public List<RequestHeader> additionalHeaders;
      
     public BaseRequest(string url, RequestType requestType, params RequestParams[] parameters) {
       this.url = url;
       this.requestType = requestType;
       this.parameters = parameters;
       this.finalUrl = "";
+
+      this.additionalHeaders = new List<RequestHeader>();
     }
 
     public override string ToString() {
