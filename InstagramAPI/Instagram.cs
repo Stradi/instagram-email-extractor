@@ -20,8 +20,6 @@ namespace InstagramAPI {
     private CookieContainer cookieContainer;
     private HttpClientHandler httpHandler;
 
-    private PasswordEncryptionModel passwordEncryptionKeys;
-
     public Instagram(List<ProxyModel> proxies = null) {
       client = new InstagramHttpClient(proxies);
 
@@ -71,6 +69,40 @@ namespace InstagramAPI {
       }
 
       return response;
+    }
+  
+    public async Task<string[]> GetPostLikers(CredentialModel credential, string shortcode, int total = 100) {
+      int totalScraped = 0;
+      List<string> scrapedUsernames = new List<string>();
+      string endCursor = "";
+
+      while(totalScraped < total) {
+        GetPostLikersRequest postLikersRequest;
+        if(endCursor == "") {
+          postLikersRequest = new GetPostLikersRequest(shortcode);
+        } else {
+          postLikersRequest = new GetPostLikersRequest(shortcode, endCursor);
+        }
+
+        HttpRequestMessage req = client.CreateHttpRequestMessage(postLikersRequest);
+        HttpResponseMessage httpResponse = await client.SendAuthenticatedRequestAsync(req, credential);
+
+        GetPostLikersResponse response = new GetPostLikersResponse();
+        response.ConvertFromJSON(await httpResponse.Content.ReadAsStringAsync());
+
+        if(response.Usernames.Length > 0) {
+          scrapedUsernames.AddRange(response.Usernames);
+          totalScraped += response.Usernames.Length;
+        }
+
+        if(response.HasNextPage) {
+          endCursor = response.EndCursor;
+        } else {
+          return scrapedUsernames.ToArray();
+        }
+      }
+
+      return scrapedUsernames.ToArray();
     }
   }
 }

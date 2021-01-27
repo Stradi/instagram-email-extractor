@@ -51,7 +51,7 @@ namespace InstagramAPI {
         request.Content = postRequest.GetData();
       }
 
-      request.RequestUri = new System.Uri(req.URL);
+      request.RequestUri = new System.Uri(req.ToString());
 
       SetDefaultHeaders(ref request);
       if(req.additionalHeaders.Count > 0) {
