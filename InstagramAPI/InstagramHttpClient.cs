@@ -100,6 +100,7 @@ namespace InstagramAPI {
 
       defaultHeaders.Add(new RequestHeader() { name = "x-ig-appid", value = Constants.IG_APPID });
       defaultHeaders.Add(new RequestHeader() { name = "x-requested-with", value = "XMLHttpRequest" });
+      defaultHeaders.Add(new RequestHeader() { name = "user-agent", value = Constants.USER_AGENT });
 
       SetHeaders(ref request, defaultHeaders.ToArray());
     }
