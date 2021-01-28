@@ -19,9 +19,14 @@ namespace InstagramAPI.ConsoleTest {
       Instagram ig = new Instagram(proxies);
 
       List<CredentialModel> credentials = new List<CredentialModel>();
+      credentials.Add(new CredentialModel("", ""));
+
       await ig.LoginAsync(credentials[0]);
-      await ig.GetPostLikers(credentials[0], "");
-      await ig.ExtractUser(credentials[0], "");
+      PartialUserModel[] comms = await ig.GetPostCommenters(credentials[0], "");
+
+      for(int i = 0; i < comms.Length; i++) {
+        Console.WriteLine(comms[i].username);
+      }
     }
   }
 }

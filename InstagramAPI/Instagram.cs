@@ -103,6 +103,41 @@ namespace InstagramAPI {
 
       return scrapedUsernames.ToArray();
     }
+
+    public async Task<PartialUserModel[]> GetPostCommenters(CredentialModel credential, string shortcode, int total = 24) {
+      int totalScraped = 0;
+      List<PartialUserModel> scrapedUsernames = new List<PartialUserModel>();
+      string endCursor = "";
+
+      while(totalScraped < total) {
+        BaseRequest postCommentersRequest;
+
+        if(endCursor == "") {
+          postCommentersRequest = new PostInformationRequest(shortcode);
+        } else {
+          postCommentersRequest = new GetPostCommentersRequest(shortcode, endCursor);
+        }
+
+        HttpRequestMessage req = client.CreateHttpRequestMessage(postCommentersRequest);
+        HttpResponseMessage httpResponse = await client.SendAuthenticatedRequestAsync(req, credential);
+
+        GetPostCommentersResponse response = new GetPostCommentersResponse();
+        response.ConvertFromJSON(await httpResponse.Content.ReadAsStringAsync());
+
+        if(response.Users.Length > 0) {
+          scrapedUsernames.AddRange(response.Users);
+          totalScraped += response.Users.Length;
+        }
+
+        if(response.HasNextPage) {
+          endCursor = response.EndCursor;
+        } else {
+          return scrapedUsernames.ToArray();
+        }
+      }
+
+      return scrapedUsernames.ToArray();
+    }
     
     public async Task<UserModel> ExtractUser(CredentialModel credential, string userId) {
       ExtractUserRequest extractUserRequest = new ExtractUserRequest(userId);
