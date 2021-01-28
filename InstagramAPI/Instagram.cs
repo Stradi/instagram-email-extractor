@@ -125,8 +125,9 @@ namespace InstagramAPI {
         response.ConvertFromJSON(await httpResponse.Content.ReadAsStringAsync());
 
         if(response.Users.Length > 0) {
-          scrapedUsernames.AddRange(response.Users);
-          totalScraped += response.Users.Length;
+          PartialUserModel[] distinct = response.Users.GroupBy(user => user.userId).Select(user => user.First()).ToArray();
+          scrapedUsernames.AddRange(distinct);
+          totalScraped += distinct.Length;
         }
 
         if(response.HasNextPage) {
