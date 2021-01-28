@@ -2,6 +2,7 @@ using System.Linq;
 
 using Newtonsoft.Json.Linq;
 
+using InstagramAPI.Models;
 using InstagramAPI.Helpers;
 
 namespace InstagramAPI.Responses {  
@@ -9,7 +10,7 @@ namespace InstagramAPI.Responses {
     public int TotalLikers;
     public bool HasNextPage;
     public string EndCursor;
-    public string[] Usernames;
+    public PartialUserModel[] Users;
 
     public void ConvertFromJSON(string json) {
       JObject obj = JsonHelper.ConvertFromJSON(json);
@@ -22,7 +23,13 @@ namespace InstagramAPI.Responses {
         }
 
         JArray usersArray = (JArray)postObject["edges"];
-        Usernames = usersArray.Select(user => (string)user["node"]["username"]).ToArray();
+        Users = usersArray.Select(user => new PartialUserModel() {
+          userId = (string)user["node"]["id"],
+          username = (string)user["node"]["username"],
+          fullName = (string)user["node"]["full_name"],
+          isPrivate = (bool)user["node"]["is_private"],
+          isVerified = (bool)user["node"]["is_verified"]
+        }).ToArray();
       }
     }
   }

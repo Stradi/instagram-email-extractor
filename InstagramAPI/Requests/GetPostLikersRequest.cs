@@ -1,6 +1,6 @@
 namespace InstagramAPI.Requests {
   public class GetPostLikersRequest : GetRequest {
-    public GetPostLikersRequest(string shortcode, string endCursor = null) : base(Constants.GRAPHQL_URL) {
+    public GetPostLikersRequest(string shortcode, string endCursor = null) : base("") {
       this.url = Constants.GRAPHQL_URL;
 
       string variablesParam = "";

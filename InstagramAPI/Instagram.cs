@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 using InstagramAPI.Proxy;
 using InstagramAPI.Models;
@@ -71,9 +70,9 @@ namespace InstagramAPI {
       return response;
     }
   
-    public async Task<string[]> GetPostLikers(CredentialModel credential, string shortcode, int total = 100) {
+    public async Task<PartialUserModel[]> GetPostLikers(CredentialModel credential, string shortcode, int total = 100) {
       int totalScraped = 0;
-      List<string> scrapedUsernames = new List<string>();
+      List<PartialUserModel> scrapedUsernames = new List<PartialUserModel>();
       string endCursor = "";
 
       while(totalScraped < total) {
@@ -90,9 +89,9 @@ namespace InstagramAPI {
         GetPostLikersResponse response = new GetPostLikersResponse();
         response.ConvertFromJSON(await httpResponse.Content.ReadAsStringAsync());
 
-        if(response.Usernames.Length > 0) {
-          scrapedUsernames.AddRange(response.Usernames);
-          totalScraped += response.Usernames.Length;
+        if(response.Users.Length > 0) {
+          scrapedUsernames.AddRange(response.Users);
+          totalScraped += response.Users.Length;
         }
 
         if(response.HasNextPage) {
