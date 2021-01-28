@@ -103,5 +103,18 @@ namespace InstagramAPI {
 
       return scrapedUsernames.ToArray();
     }
+    
+    public async Task<UserModel> ExtractUser(CredentialModel credential, string userId) {
+      ExtractUserRequest extractUserRequest = new ExtractUserRequest(userId);
+      HttpRequestMessage request = client.CreateHttpRequestMessage(extractUserRequest);
+
+      HttpResponseMessage httpResponse = await client.SendAuthenticatedRequestAsync(request, credential);
+   
+      ExtractUserResponse response = new ExtractUserResponse();
+      string responseContent = await httpResponse.Content.ReadAsStringAsync();
+      
+      response.ConvertFromJSON(responseContent);
+      return response.User;
+    }
   }
 }
