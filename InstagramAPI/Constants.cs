@@ -10,6 +10,7 @@ namespace InstagramAPI {
     public static string POST_INFO_QUERY_HASH = "2c4c2e343a8f64c625ba02b2aa12c7f8";
     public static string POST_LIKERS_QUERY_HASH = "d5d763b1e2acf209d62d22d184488e57";
     public static string POST_COMMENTERS_QUERY_HASH = "bc3296d1ce80a24b1b6e40b1e72903f5";
+    public static string HASHTAG_POSTS_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32";
 
     public static string USER_INFO_URL = API_URL + "users/{0}/info/";
 

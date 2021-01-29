@@ -139,6 +139,48 @@ namespace InstagramAPI {
 
       return scrapedUsernames.ToArray();
     }
+
+    public async Task<PostModel[]> GetPostsFromHashtag(CredentialModel credential, string hashtag, int total = 100) {
+      int totalScraped = 0;
+      List<PostModel> scrapedPosts = new List<PostModel>();
+      string endCursor = "";
+      bool isTopPostsAdded = false;
+
+      while(totalScraped < total) {
+        GetHashtagPostsRequest hashtagPostsRequest;
+        if(endCursor == "") {
+          hashtagPostsRequest = new GetHashtagPostsRequest(hashtag);
+        } else {
+          hashtagPostsRequest = new GetHashtagPostsRequest(hashtag, endCursor);
+        }
+
+        HttpRequestMessage req = client.CreateHttpRequestMessage(hashtagPostsRequest);
+        HttpResponseMessage httpResponse = await client.SendAuthenticatedRequestAsync(req, credential);
+      
+        GetHashtagPostsResponse response = new GetHashtagPostsResponse();
+        response.ConvertFromJSON(await httpResponse.Content.ReadAsStringAsync());
+
+        if(!isTopPostsAdded) {
+          totalScraped += response.TopPosts.Length;
+          scrapedPosts.AddRange(response.TopPosts);
+        
+          isTopPostsAdded = true;
+        }
+
+        if(response.AllPosts.Length > 0) {
+          totalScraped += response.AllPosts.Length;
+          scrapedPosts.AddRange(response.AllPosts);
+        }
+
+        if(response.HasNextPage) {
+          endCursor = response.EndCursor;
+        } else {
+          return scrapedPosts.ToArray();
+        }
+      }
+
+      return scrapedPosts.ToArray();
+    }
     
     public async Task<UserModel> ExtractUser(CredentialModel credential, string userId) {
       ExtractUserRequest extractUserRequest = new ExtractUserRequest(userId);
