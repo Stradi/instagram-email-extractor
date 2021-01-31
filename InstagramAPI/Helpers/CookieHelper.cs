@@ -39,6 +39,8 @@ namespace InstagramAPI.Helpers {
         cookieString += string.Format("{0}={1};", c.Name, c.Value);
       }
 
+      cookieString = cookieString.Remove(cookieString.Length - 1);
+
       return cookieString;
     }
   }
