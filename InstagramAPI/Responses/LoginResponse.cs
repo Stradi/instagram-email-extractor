@@ -6,6 +6,7 @@ namespace InstagramAPI.Responses {
     public bool user;
     public string userId;
     public bool authenticated;
+    public string message;
   }
 
   public class LoginResponse : IResponse {
@@ -13,6 +14,7 @@ namespace InstagramAPI.Responses {
     public bool IsUserExists;
     public bool IsAuthenticated;
     public string UserID;
+    public string ErrorMessage;
     
     public void ConvertFromJSON(string json) {
       LoginResponseObject obj = JsonHelper.ConvertFromJSON<LoginResponseObject>(json);
@@ -23,6 +25,7 @@ namespace InstagramAPI.Responses {
         this.UserID = obj.userId;
       } else {
         this.IsSuccessfull = false;
+        this.ErrorMessage = obj.message;
       }
     }
   }
