@@ -1,29 +1,40 @@
+using System.Collections.Generic;
+
 using InstagramAPI.Models;
 
 namespace InstagramAPI {
   public class CredentialManager {
-    private CredentialModel[] credentials;
+    private List<CredentialModel> credentials;
     private int requestLimit;
 
     private int currentCredentialIndex = 0;
 
     public int TotalCredentials {
       get {
-        return credentials.Length;
+        return credentials.Count;
       }
     }
 
-    public CredentialManager(CredentialModel[] credentials, int requestLimit = 200) {
-      this.credentials = credentials;
+    public CredentialManager(int requestLimit = 200) {
       this.requestLimit = requestLimit;
+
+      this.credentials = new List<CredentialModel>();
+    }
+
+    public void AddCredential(CredentialModel cred) {
+      credentials.Add(cred);
     }
 
     public CredentialModel GetCredential() {
-      if(credentials[currentCredentialIndex].TotalRequests < TotalCredentials) {
+      if(credentials.Count <= 0) {
+        return null;
+      }
+
+      if(credentials[currentCredentialIndex].TotalRequests < requestLimit) {
         CredentialModel cred = credentials[currentCredentialIndex];
         
         currentCredentialIndex++;
-        if(currentCredentialIndex >= credentials.Length) {
+        if(currentCredentialIndex >= credentials.Count) {
           currentCredentialIndex = 0;
         }
         

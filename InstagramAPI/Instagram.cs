@@ -10,12 +10,16 @@ using InstagramAPI.Requests;
 using InstagramAPI.Responses;
 
 namespace InstagramAPI {
+  public delegate void DataAcquired(PartialUserModel[] user);
+
   public class Instagram {
     public CredentialManager credentialManager;
     private InstagramHttpClient client;
+
+    public event DataAcquired OnUserFetched;
     
-    public Instagram(CredentialModel[] credentials, List<ProxyModel> proxies = null) {
-      credentialManager = new CredentialManager(credentials);
+    public Instagram(List<ProxyModel> proxies = null) {
+      credentialManager = new CredentialManager();
       client = new InstagramHttpClient(proxies);
     }
 
@@ -53,15 +57,16 @@ namespace InstagramAPI {
         string loginCookies = CookieHelper.ExtractResponseCookies(loginPostResponse);
         credential.SetCookies(CookieHelper.CookieStringToArray(loginCookies));
         credential.IsLoggedIn = true;
+
+        credentialManager.AddCredential(credential);
       }
 
       return response;
     }
   
-    public async Task<PartialUserModel[]> GetPostLikers(string shortcode, int total = 100) {
+    public async Task<PartialUserModel[]> GetPostLikers(string shortcode, int total = 100, string endCursor = "") {
       int totalScraped = 0;
       List<PartialUserModel> scrapedUsernames = new List<PartialUserModel>();
-      string endCursor = "";
 
       while(totalScraped < total) {
         CredentialModel credential = credentialManager.GetCredential();
@@ -82,6 +87,8 @@ namespace InstagramAPI {
         if(response.Users.Length > 0) {
           scrapedUsernames.AddRange(response.Users);
           totalScraped += response.Users.Length;
+
+          OnUserFetched?.Invoke(response.Users);
         }
 
         if(response.HasNextPage) {
@@ -94,11 +101,9 @@ namespace InstagramAPI {
       return scrapedUsernames.ToArray();
     }
 
-    public async Task<PartialUserModel[]> GetPostCommenters(string shortcode, int total = 24) {
-      
+    public async Task<PartialUserModel[]> GetPostCommenters(string shortcode, int total = 24, string endCursor = "") {
       int totalScraped = 0;
       List<PartialUserModel> scrapedUsernames = new List<PartialUserModel>();
-      string endCursor = "";
 
       while(totalScraped < total) {
         CredentialModel credential = credentialManager.GetCredential();
@@ -121,6 +126,8 @@ namespace InstagramAPI {
           PartialUserModel[] distinct = response.Users.GroupBy(user => user.userId).Select(user => user.First()).ToArray();
           scrapedUsernames.AddRange(distinct);
           totalScraped += distinct.Length;
+
+          OnUserFetched?.Invoke(distinct);
         }
 
         if(response.HasNextPage) {
@@ -133,10 +140,9 @@ namespace InstagramAPI {
       return scrapedUsernames.ToArray();
     }
 
-    public async Task<PostModel[]> GetPostsFromHashtag(string hashtag, int total = 100) {      
+    public async Task<PostModel[]> GetPostsFromHashtag(string hashtag, int total = 100, string endCursor = "") {      
       int totalScraped = 0;
       List<PostModel> scrapedPosts = new List<PostModel>();
-      string endCursor = "";
       bool isTopPostsAdded = false;
 
       while(totalScraped < total) {
