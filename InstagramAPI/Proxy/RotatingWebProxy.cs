@@ -1,21 +1,38 @@
+using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using InstagramAPI.Models;
-using System;
 
 namespace InstagramAPI.Proxy {
   public class RotatingWebProxy : IWebProxy {
+    private const string PROXY_CHECK_API = "https://api.ipify.org";
+    private string myIp;
+
     private List<ProxyModel> proxies;
     private int currentProxyIndex = 0;
 
     public ICredentials Credentials { get; set; }
     
-    public RotatingWebProxy(List<ProxyModel> proxies) {
-      this.proxies = proxies;
+    public RotatingWebProxy() {
+      proxies = new List<ProxyModel>();
+      myIp = GetIP();
+    }
+
+    public bool AddProxy(ProxyModel proxy) {
+      if(IsProxyWorking(proxy)) {
+        Console.WriteLine("Proxy working.");
+        proxies.Add(proxy);
+        return true;
+      }
+      Console.WriteLine("Proxy not working.");
+      return false;
+    }
+
+    public void AddMultipleProxies(ProxyModel[] proxies) {
+      for(int i = 0; i < proxies.Length; i++) {
+        AddProxy(proxies[i]);
+      }
     }
 
     public Uri GetProxy(Uri destination) {
@@ -38,8 +55,23 @@ namespace InstagramAPI.Proxy {
 
       return proxy;
     }
+    
+    private bool IsProxyWorking(ProxyModel proxy) {
+      return !(GetIP() != myIp);
+    }
+
+    private string GetIP(ProxyModel proxy = null) {
+      WebClient wc = new WebClient();
+      if(proxy != null) {
+        wc.Proxy = new WebProxy(proxy.ipAddress, proxy.port);
+      }
+      return wc.DownloadString(PROXY_CHECK_API);
+    }
 
     public bool IsBypassed(Uri host) {
+      if(proxies.Count <= 0) {
+        return true;
+      }
       return false;
     }
   }

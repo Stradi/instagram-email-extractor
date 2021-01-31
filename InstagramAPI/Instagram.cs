@@ -1,9 +1,9 @@
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using InstagramAPI.Proxy;
 using InstagramAPI.Models;
 using InstagramAPI.Helpers;
 using InstagramAPI.Requests;
@@ -14,13 +14,16 @@ namespace InstagramAPI {
 
   public class Instagram {
     public CredentialManager credentialManager;
+    public RotatingWebProxy webProxy;
     private InstagramHttpClient client;
 
     public event DataAcquired OnUserFetched;
     
-    public Instagram(List<ProxyModel> proxies = null) {
+    public Instagram() {
+      webProxy = new RotatingWebProxy();
+
       credentialManager = new CredentialManager();
-      client = new InstagramHttpClient(proxies);
+      client = new InstagramHttpClient(webProxy);
     }
 
     //TODO: Create Response classes for each response.

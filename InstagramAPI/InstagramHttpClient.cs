@@ -17,12 +17,9 @@ namespace InstagramAPI {
 
     private PasswordEncryptionModel passwordEncryptionKeys;
 
-    public InstagramHttpClient(List<ProxyModel> proxies) {
+    public InstagramHttpClient(RotatingWebProxy webProxy) {
       httpClientHandler = new HttpClientHandler();
-
-      if(proxies.Count != 0) {
-        httpClientHandler.Proxy = new RotatingWebProxy(proxies);
-      }
+      httpClientHandler.Proxy = webProxy;
 
       httpClient = new HttpClient(httpClientHandler);
     }
@@ -82,6 +79,9 @@ namespace InstagramAPI {
       return Regex.Match(html, "/\"rollout_hash\":\"([^\"]*\")/g").Groups[0].Value;
     }
 
+    //TODO: Try to find encryption keys in headers,
+    // if we cannot find it, Instagram sends it in Html response.
+    // Try to find it using Regex.
     public PasswordEncryptionModel GetPasswordEncryptionHeaders(HttpResponseMessage response) {
       if(string.IsNullOrEmpty(passwordEncryptionKeys.keyId) ||
          string.IsNullOrEmpty(passwordEncryptionKeys.keyVersion) || 
