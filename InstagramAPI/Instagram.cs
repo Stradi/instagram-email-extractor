@@ -10,7 +10,7 @@ using InstagramAPI.Requests;
 using InstagramAPI.Responses;
 
 namespace InstagramAPI {
-  public delegate void DataAcquired(PartialUserModel[] user);
+  public delegate void DataAcquired(PartialUserModel[] user, string endCursor);
 
   public class Instagram {
     public CredentialManager credentialManager;
@@ -88,7 +88,7 @@ namespace InstagramAPI {
           scrapedUsernames.AddRange(response.Users);
           totalScraped += response.Users.Length;
 
-          OnUserFetched?.Invoke(response.Users);
+          OnUserFetched?.Invoke(response.Users, endCursor);
         }
 
         if(response.HasNextPage) {
@@ -127,7 +127,7 @@ namespace InstagramAPI {
           scrapedUsernames.AddRange(distinct);
           totalScraped += distinct.Length;
 
-          OnUserFetched?.Invoke(distinct);
+          OnUserFetched?.Invoke(distinct, endCursor);
         }
 
         if(response.HasNextPage) {
