@@ -1,6 +1,5 @@
 using System.Net;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace InstagramAPI.Models {
   public class CredentialModel {
@@ -37,6 +36,14 @@ namespace InstagramAPI.Models {
 
       Cookie c = cookies.First(cookie => cookie.Name == "csrftoken");
       return c.Value;
+    }
+
+    public string Serialize() {
+      return Helpers.JsonHelper.SerializeObject<CredentialModel>(this);
+    }
+
+    public static CredentialModel Deserialize(string json) {
+      return Helpers.JsonHelper.DeserializeObject<CredentialModel>(json);
     }
   }
 }

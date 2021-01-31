@@ -12,5 +12,13 @@ namespace InstagramAPI.Helpers {
       JObject obj = JObject.Parse(json);
       return obj;
     }
+
+    public static string SerializeObject<T>(T obj) {
+      return JsonConvert.SerializeObject(obj);
+    }
+
+    public static T DeserializeObject<T>(string json) {
+      return JsonConvert.DeserializeObject<T>(json);
+    }
   }
 }
