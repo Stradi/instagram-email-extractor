@@ -13,12 +13,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.IO;
+
 using InstagramAPI.Responses;
 
 using InstagramEmailExtractor.Models;
 
 namespace InstagramEmailExtractor {
   public partial class CredentialManager : Page {
+    private const string DATA_DIRECTORY = "./data";
+    private const string CRED_FILENAME = "creds.json";
+    private string CRED_PATH = string.Format("{0}/{1}", DATA_DIRECTORY, CRED_FILENAME); 
+
     private List<Credential> credentialItems;
     private int idCounter;
 
@@ -29,6 +35,34 @@ namespace InstagramEmailExtractor {
       CredentialList.ItemsSource = credentialItems;
 
       idCounter = 0;
+      LoadCredentials();
+    }
+
+    private void LoadCredentials() {
+      if(Directory.Exists(DATA_DIRECTORY)) {
+        //If directory exists but file does not exists
+        //that means structure is corrupted. Just
+        //create a file and exit function.
+        if(!File.Exists(CRED_PATH)) {
+          File.Create(CRED_PATH);
+          return;
+        }
+
+        //Read all lines from file and add that
+        //logged in credentials to Instagram.credentialManager
+        //also add them to ListView.
+        string[] credsJson = File.ReadAllLines(CRED_PATH);
+        for(int i = 0; i < credsJson.Length; i++) {
+          string currentCredential = credsJson[i];
+          InstagramAPI.Models.CredentialModel credModel = InstagramAPI.Models.CredentialModel.Deserialize(currentCredential);
+          MainWindow.Instagram.credentialManager.AddCredential(credModel);
+          
+          AddNewCredential(credModel.username, credModel.password, true);
+        }
+      } else {
+        //If directory not exists create.
+        Directory.CreateDirectory(DATA_DIRECTORY);
+      }
     }
 
     private void btn_AddCredential_AddOne(object sender, RoutedEventArgs e) {
@@ -50,24 +84,27 @@ namespace InstagramEmailExtractor {
       //TODO: Fill this.
     }
 
-    private async void AddNewCredential(string username, string password) {
+    private async void AddNewCredential(string username, string password, bool loadedFromFile = false) {
       bool alreadyExists = credentialItems.Where(cred => cred.Username == username).ToArray().Length > 0;
       if(alreadyExists) {
         //Log error
         return;
       }
 
+      Credential.StatusMessages status = !loadedFromFile ? Credential.StatusMessages.NewlyAdded : Credential.StatusMessages.LoadedFromFile;
       Credential c = new Credential() {
         Id = idCounter++,
         Username = username,
         Password = password,
-        Status = Credential.StatusMessages.NewlyAdded
+        Status = status
       };
 
       credentialItems.Add(c);
       CredentialList.Items.Refresh();
 
-      await LoginCredential(c);
+      if(!loadedFromFile) {
+        await LoginCredential(c);
+      }
     }
 
     private async Task LoginCredential(Credential cred) {
@@ -82,6 +119,10 @@ namespace InstagramEmailExtractor {
 
       if(resp.IsAuthenticated) {
         ChangeCredentialStatus(cred, Credential.StatusMessages.LoggedIn);
+        //Save to file
+        string serialized = MainWindow.Instagram.credentialManager.FindWithUsername(cred.Username).Serialize();
+        await File.AppendAllLinesAsync(CRED_PATH, new[] { serialized });
+
       } else {
         ChangeCredentialStatus(cred, Credential.StatusMessages.Error);
         //Username or password is wrong.

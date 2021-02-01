@@ -17,6 +17,7 @@
       public static StatusMessages LoggingIn { get { return new StatusMessages("Logging in"); }}
       public static StatusMessages LoggedIn { get { return new StatusMessages("Logged in"); }}
       public static StatusMessages Error { get { return new StatusMessages("Login failed"); }}
+      public static StatusMessages LoadedFromFile { get { return new StatusMessages("Loaded from file"); }}
     }
 
     public int Id { get; set; }
