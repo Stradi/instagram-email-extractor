@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using InstagramAPI.Responses;
+
 using InstagramEmailExtractor.Models;
 
 namespace InstagramEmailExtractor {
@@ -48,10 +50,10 @@ namespace InstagramEmailExtractor {
       //TODO: Fill this.
     }
 
-    private void AddNewCredential(string username, string password) {
+    private async void AddNewCredential(string username, string password) {
       bool alreadyExists = credentialItems.Where(cred => cred.Username == username).ToArray().Length > 0;
       if(alreadyExists) {
-        MessageBox.Show("The account you've tried to add already added.", "Could not add new Credential", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //Log error
         return;
       }
 
@@ -59,11 +61,31 @@ namespace InstagramEmailExtractor {
         Id = idCounter++,
         Username = username,
         Password = password,
-        Status = "Newly added"
+        Status = Credential.StatusMessages.NewlyAdded
       };
 
       credentialItems.Add(c);
       CredentialList.Items.Refresh();
+
+      await LoginCredential(c);
+    }
+
+    private async Task LoginCredential(Credential cred) {
+      ChangeCredentialStatus(cred, Credential.StatusMessages.LoggingIn);
+      LoginResponse resp = await MainWindow.Instagram.LoginAsync(new InstagramAPI.Models.CredentialModel(cred.Username, cred.Password));
+
+      if(!resp.IsSuccessfull) {
+        ChangeCredentialStatus(cred, Credential.StatusMessages.Error);
+        MessageBox.Show(resp.ErrorMessage);
+        return;
+      }
+
+      if(resp.IsAuthenticated) {
+        ChangeCredentialStatus(cred, Credential.StatusMessages.LoggedIn);
+      } else {
+        ChangeCredentialStatus(cred, Credential.StatusMessages.Error);
+        //Username or password is wrong.
+      }
     }
 
     private bool ValidateTextboxes(params TextBox[] inputs) {
@@ -82,6 +104,11 @@ namespace InstagramEmailExtractor {
       for(int i = 0; i < inputs.Length; i++) {
         inputs[i].BorderBrush = Brushes.LightGray;
       }
+    }
+
+    private void ChangeCredentialStatus(Credential cred, Credential.StatusMessages statusMessage) {
+      cred.Status = statusMessage;
+      CredentialList.Items.Refresh();
     }
   }
 }

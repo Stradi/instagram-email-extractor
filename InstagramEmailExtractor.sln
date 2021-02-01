@@ -7,7 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstagramAPI", "InstagramAP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstagramAPI.ConsoleTest", "InstagramAPI.ConsoleTest\InstagramAPI.ConsoleTest.csproj", "{84DF34CA-A9D7-450F-93B3-0CE24994E119}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstagramEmailExtractor", "InstagramEmailExtractor\InstagramEmailExtractor.csproj", "{1B385542-9877-4D70-9BA8-2CF9DFC8C659}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstagramEmailExtractor", "InstagramEmailExtractor\InstagramEmailExtractor.csproj", "{1B385542-9877-4D70-9BA8-2CF9DFC8C659}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FA27C2F2-D582-4DFA-B00C-94161C164975} = {FA27C2F2-D582-4DFA-B00C-94161C164975}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
