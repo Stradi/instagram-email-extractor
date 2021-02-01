@@ -14,14 +14,24 @@
             <RowDefinition Height="174.01"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Label Content="Row1"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="397"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <GroupBox Header="Extract from Post Likers"></GroupBox>
         </Grid>
-        <Grid Grid.Row="1">
-            <Label Content="Row2"/>
+        <Grid Grid.Row="0" Grid.Column="1">
+            <GroupBox Header="Extract from Post Commenters"></GroupBox>
         </Grid>
-        <Grid Grid.Row="2">
-            <Label Content="Row3"/>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <GroupBox Header="Extract from Hashtag"></GroupBox>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <GroupBox Header="Extract from Location"></GroupBox>
+        </Grid>
+        <Grid Grid.Row="2" Grid.ColumnSpan="2">
+            <GroupBox Header="Found Emails"></GroupBox>
         </Grid>
     </Grid>
 </Page>
