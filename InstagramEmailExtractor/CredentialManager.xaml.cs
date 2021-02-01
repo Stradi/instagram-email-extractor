@@ -84,6 +84,14 @@ namespace InstagramEmailExtractor {
       //TODO: Fill this.
     }
 
+    private void btn_AddProxy_AddOne(object sender, RoutedEventArgs e) {
+    
+    }
+
+    private void btn_AddProxy_Load(object sender, RoutedEventArgs e) {
+    
+    }
+    
     private async void AddNewCredential(string username, string password, bool loadedFromFile = false) {
       bool alreadyExists = credentialItems.Where(cred => cred.Username == username).ToArray().Length > 0;
       if(alreadyExists) {
