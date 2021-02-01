@@ -21,6 +21,9 @@
             <TabItem Header="Credential Manager">
                 <Frame Source="/CredentialManager.xaml"/>
             </TabItem>
+            <TabItem Header="Extractor">
+                <Frame Source="/Extractor.xaml"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
