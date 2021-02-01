@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InstagramEmailExtractor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight">
+        Title="MainWindow" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid Width="800" Height="600">
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />

@@ -24,9 +24,5 @@ namespace InstagramEmailExtractor {
 
       Instagram = new Instagram();
     }
-
-    private void MyAccount_Click(object sender, MouseButtonEventArgs e) {
-
-    }
   }
 }
