@@ -16,6 +16,9 @@ namespace InstagramEmailExtractor {
     private int foundUsers;
     private int extractedUsers;
 
+    private int extractionThreadCount;
+    private Thread[] extractionThreads;
+
     public Extractor() {
       InitializeComponent();
 
@@ -28,8 +31,17 @@ namespace InstagramEmailExtractor {
       foundUsers = 0;
       extractedUsers = 0;
 
-      Thread extractThread1 = new Thread(new ThreadStart(StartEmailExtraction));
-      extractThread1.Start();
+      extractionThreadCount = 5;
+      extractionThreads = new Thread[extractionThreadCount];
+      InitiateExtractionThreads(extractionThreadCount);
+    }
+
+    private void InitiateExtractionThreads(int numThreads) {
+      for(int i = 0; i < numThreads; i++) {
+        Thread t = new Thread(new ThreadStart(StartEmailExtraction));
+        t.Start();
+        extractionThreads[i] = t;
+      }
     }
     
     private async void StartEmailExtraction() {
