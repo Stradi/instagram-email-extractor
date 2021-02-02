@@ -66,7 +66,7 @@ namespace InstagramEmailExtractor {
     }
 
     private void btn_AddCredential_AddOne(object sender, RoutedEventArgs e) {
-      if(!ValidateTextboxes(tb_AddCredential_Username, tb_AddCredential_Password)) {
+      if(!FormHelpers.ValidateTextboxes(tb_AddCredential_Username, tb_AddCredential_Password)) {
         return;
       }
 
@@ -75,7 +75,7 @@ namespace InstagramEmailExtractor {
 
       AddNewCredential(username, password);
 
-      ResetTextboxColors(tb_AddCredential_Username, tb_AddCredential_Password);
+      FormHelpers.ResetTextboxColors(tb_AddCredential_Username, tb_AddCredential_Password);
       tb_AddCredential_Username.Text = "";
       tb_AddCredential_Password.Text = "";
     }
@@ -134,24 +134,6 @@ namespace InstagramEmailExtractor {
       } else {
         ChangeCredentialStatus(cred, Credential.StatusMessages.Error);
         //Username or password is wrong.
-      }
-    }
-
-    private bool ValidateTextboxes(params TextBox[] inputs) {
-      bool hasErrors = false;
-      for(int i = 0; i < inputs.Length; i++) {
-        if(string.IsNullOrEmpty(inputs[i].Text)) {
-          inputs[i].BorderBrush = Brushes.Red;
-          hasErrors = true;
-        }
-      }
-
-      return !hasErrors;
-    }
-
-    private void ResetTextboxColors(params TextBox[] inputs) {
-      for(int i = 0; i < inputs.Length; i++) {
-        inputs[i].BorderBrush = Brushes.LightGray;
       }
     }
 
