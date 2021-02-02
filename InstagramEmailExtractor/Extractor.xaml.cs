@@ -1,27 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+using System.Threading;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
+using System.Windows.Controls;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using InstagramAPI.Models;
 
 namespace InstagramEmailExtractor {
-  /// <summary>
-  /// Interaction logic for Extractor.xaml
-  /// </summary>
   public partial class Extractor : Page {
     private Channel<PartialUserModel> fetchedUsers;
     private List<UserModel> usersWithEmail;
@@ -40,30 +28,26 @@ namespace InstagramEmailExtractor {
       foundUsers = 0;
       extractedUsers = 0;
 
-      Thread extractThread1 = new Thread(new ThreadStart(EmailExtraction));
+      Thread extractThread1 = new Thread(new ThreadStart(StartEmailExtraction));
       extractThread1.Start();
     }
     
-    private async void EmailExtraction() {
+    private async void StartEmailExtraction() {
       while(true) {
         if(fetchedUsers.Count > 0) {
           UserModel user = await MainWindow.Instagram.ExtractUser(fetchedUsers.Dequeue().userId);
           extractedUsers++;
-          if(!string.IsNullOrEmpty(user.email)) {
-            AddExtractedUserToList(user);
-          }
 
           await this.Dispatcher.BeginInvoke((Action)(() => {
+            if(!string.IsNullOrEmpty(user.email)) {
+              usersWithEmail.Add(user);
+              FoundEmails_List.Items.Refresh();
+            }
+
             UpdateStatusLabel();
           }));
         }
       }
-    }
-
-    private void AddExtractedUserToList(UserModel user) {
-      this.Dispatcher.BeginInvoke((Action)(() => {
-        AddUserToListView(user);
-      }));
     }
 
     private void Instagram_OnUserFetched(PartialUserModel[] user, string endCursor) {
@@ -100,13 +84,8 @@ namespace InstagramEmailExtractor {
       await MainWindow.Instagram.GetPostLikers(shortcode, totalExtractions);
     }
 
-    private void AddUserToListView(UserModel user) {
-      usersWithEmail.Add(user);
-      FoundEmails_List.Items.Refresh();
-    }
-
     private void UpdateStatusLabel() {
-      lbl_ExtractionStatus.Content = string.Format("Found {0} likers\n Email/Extraction Ratio {1}/{2}.", foundUsers, usersWithEmail.Count, extractedUsers);
+      lbl_ExtractionStatus.Content = string.Format("Found {0} users.\nScanned {1} users, found {2} emails.", foundUsers, extractedUsers, usersWithEmail.Count);
     }
 
     private string ExtractShortcodeFromURL(string url) {
