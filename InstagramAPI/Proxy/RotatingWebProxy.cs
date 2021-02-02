@@ -21,11 +21,9 @@ namespace InstagramAPI.Proxy {
 
     public bool AddProxy(ProxyModel proxy) {
       if(IsProxyWorking(proxy)) {
-        Console.WriteLine("Proxy working.");
         proxies.Add(proxy);
         return true;
       }
-      Console.WriteLine("Proxy not working.");
       return false;
     }
 
@@ -42,11 +40,7 @@ namespace InstagramAPI.Proxy {
     // Added this function because in future we may want to choose proxy with another algorithm
     // such as checking request count made by proxy to avoid IP bans etc.
     private string GetAvailableProxy() {
-      string proxy = string.Format(
-        "http://{0}:{1}",
-        proxies[currentProxyIndex].ipAddress,
-        proxies[currentProxyIndex].port
-      );
+      string proxy = proxies[currentProxyIndex].host;
 
       currentProxyIndex++;
       if(currentProxyIndex >= proxies.Count) {
@@ -57,15 +51,19 @@ namespace InstagramAPI.Proxy {
     }
     
     private bool IsProxyWorking(ProxyModel proxy) {
-      return !(GetIP() != myIp);
+      return GetIP(proxy) != myIp;
     }
 
     private string GetIP(ProxyModel proxy = null) {
       WebClient wc = new WebClient();
       if(proxy != null) {
-        wc.Proxy = new WebProxy(proxy.ipAddress, proxy.port);
+        wc.Proxy = new WebProxy(proxy.host);
       }
-      return wc.DownloadString(PROXY_CHECK_API);
+      try {
+        return wc.DownloadString(PROXY_CHECK_API);
+      } catch {
+        return myIp;
+      }
     }
 
     public bool IsBypassed(Uri host) {
