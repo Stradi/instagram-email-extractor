@@ -7,7 +7,7 @@ namespace InstagramEmailExtractor {
       bool hasErrors = false;
       for(int i = 0; i < inputs.Length; i++) {
         if(string.IsNullOrEmpty(inputs[i].Text)) {
-          inputs[i].BorderBrush = Brushes.Red;
+          ChangeControlsBorderColor(Brushes.Red, inputs[i]);
           hasErrors = true;
         }
       }
@@ -16,8 +16,12 @@ namespace InstagramEmailExtractor {
     }
 
     public static void ResetTextboxColors(params TextBox[] inputs) {
-      for(int i = 0; i < inputs.Length; i++) {
-        inputs[i].BorderBrush = Brushes.LightGray;
+      ChangeControlsBorderColor(Brushes.LightGray, inputs);
+    }
+
+    public static void ChangeControlsBorderColor(Brush color, params Control[] controls) {
+      for(int i = 0; i < controls.Length; i++) {
+        controls[i].BorderBrush = color;
       }
     }
   }

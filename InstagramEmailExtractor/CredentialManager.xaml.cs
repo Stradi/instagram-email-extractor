@@ -111,7 +111,7 @@ namespace InstagramEmailExtractor {
       CredentialList.Items.Refresh();
 
       if(!loadedFromFile) {
-        //await LoginCredential(c);
+        await LoginCredential(c);
       }
     }
 

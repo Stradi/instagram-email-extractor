@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:InstagramEmailExtractor"
+      xmlns:controls="clr-namespace:InstagramEmailExtractor.CustomControls"
       mc:Ignorable="d" 
       d:DesignHeight="522.04" d:DesignWidth="794"
       Title="Extractor">
@@ -46,11 +47,11 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <CheckBox x:Name="cb_ExtractFullName" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" IsChecked="True">Extract full name</CheckBox>
-                            <CheckBox x:Name="cb_ExtractPhoneNumber" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Extract phone number</CheckBox>
+                            <Label Grid.Column="0" Grid.Row="0" Content="How many likes you want to get?"/>
+                            <controls:NumberPicker x:Name="np_PostLikers_ExtractionCount" Grid.Column="1" Grid.Row="0"/>
+                            <CheckBox x:Name="cb_IncludeVerifiedAccounts" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Include verified accounts</CheckBox>
                             <CheckBox x:Name="cb_IncludePrivateAccounts" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" IsChecked="False">Include private accounts</CheckBox>
-                            <CheckBox x:Name="cb_ShouldHavePhoneNumber" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" IsChecked="False">Should have phone number</CheckBox>
-                            <CheckBox x:Name="cb_ShouldHaveEmail" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Should have email</CheckBox>
+                            <CheckBox x:Name="cb_ShouldHavePhoneNumber" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="False">Should have phone number</CheckBox>
                             <CheckBox x:Name="cb_IncludeBussinessAccounts" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="True">Include bussiness accounts</CheckBox>
                         </Grid>
                     </GroupBox>
@@ -73,7 +74,7 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.Column="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <ListView x:Name="FoundEmails_List" Grid.Column="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                         <ListView.View>
                             <GridView>
                                 <GridView.ColumnHeaderContainerStyle>
@@ -86,14 +87,17 @@
                                         </Style.Triggers>
                                     </Style>
                                 </GridView.ColumnHeaderContainerStyle>
-                                <GridViewColumn Header="Id" Width="25"/>
-                                <GridViewColumn Header="Username" Width="75"/>
-                                <GridViewColumn Header="Email" Width="175"/>
-                                <GridViewColumn Header="Phone Code" Width="75"/>
-                                <GridViewColumn Header="Phone Number" Width="125"/>
+                                <GridViewColumn Header="Id" DisplayMemberBinding="{Binding userId}" Width="25"/>
+                                <GridViewColumn Header="Username" DisplayMemberBinding="{Binding username}" Width="75"/>
+                                <GridViewColumn Header="Email" DisplayMemberBinding="{Binding email}" Width="175"/>
+                                <GridViewColumn Header="Phone Code" DisplayMemberBinding="{Binding phoneCountryCode}" Width="75"/>
+                                <GridViewColumn Header="Phone Number" DisplayMemberBinding="{Binding phoneNumber}" Width="125"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
+                    <Grid Grid.Column="1">
+                        <Label x:Name="lbl_ExtractionStatus" Content="Extraction Status"/>
+                    </Grid>
                 </Grid>
             </GroupBox>
         </Grid>
