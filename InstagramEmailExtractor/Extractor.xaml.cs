@@ -21,5 +21,9 @@ namespace InstagramEmailExtractor {
     public Extractor() {
       InitializeComponent();
     }
+
+    private void btn_PostLikers_Extract_Click(object sender, RoutedEventArgs e) {
+
+    }
   }
 }

@@ -19,7 +19,43 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0">
-            <GroupBox Header="Extract from Post Likers"></GroupBox>
+            <GroupBox Header="Extract from Post Likers">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Content="Post URL"/>
+                    <TextBox x:Name="tb_PostLikers_URL" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" />
+                    <Button x:Name="btn_PostLikers_Extract" Click="btn_PostLikers_Extract_Click" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Content="Start Extraction" Margin="10"/>
+
+                    <GroupBox Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="2" Header="Settings">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <CheckBox x:Name="cb_ExtractFullName" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" IsChecked="True">Extract full name</CheckBox>
+                            <CheckBox x:Name="cb_ExtractPhoneNumber" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Extract phone number</CheckBox>
+                            <CheckBox x:Name="cb_IncludePrivateAccounts" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" IsChecked="False">Include private accounts</CheckBox>
+                            <CheckBox x:Name="cb_ShouldHavePhoneNumber" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" IsChecked="False">Should have phone number</CheckBox>
+                            <CheckBox x:Name="cb_ShouldHaveEmail" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Should have email</CheckBox>
+                            <CheckBox x:Name="cb_IncludeBussinessAccounts" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="True">Include bussiness accounts</CheckBox>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
         </Grid>
         <Grid Grid.Row="0" Grid.Column="1">
             <GroupBox Header="Extract from Post Commenters"></GroupBox>
