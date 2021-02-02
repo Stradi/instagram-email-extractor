@@ -31,7 +31,35 @@
             <GroupBox Header="Extract from Location"></GroupBox>
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
-            <GroupBox Header="Found Emails"></GroupBox>
+            <GroupBox Header="Found Emails">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Grid.Column="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                        <ListView.View>
+                            <GridView>
+                                <GridView.ColumnHeaderContainerStyle>
+                                    <Style TargetType="{x:Type GridViewColumnHeader}">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="TextElement.Foreground" Value="Black"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </GridView.ColumnHeaderContainerStyle>
+                                <GridViewColumn Header="Id" Width="25"/>
+                                <GridViewColumn Header="Username" Width="75"/>
+                                <GridViewColumn Header="Email" Width="175"/>
+                                <GridViewColumn Header="Phone Code" Width="75"/>
+                                <GridViewColumn Header="Phone Number" Width="125"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </GroupBox>
         </Grid>
     </Grid>
 </Page>
