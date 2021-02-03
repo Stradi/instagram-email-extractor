@@ -52,14 +52,41 @@ namespace InstagramEmailExtractor {
 
           await this.Dispatcher.BeginInvoke((Action)(() => {
             if(!string.IsNullOrEmpty(user.email)) {
-              usersWithEmail.Add(user);
-              FoundEmails_List.Items.Refresh();
+
+              if(DoesUserMatchCriterias(user)) {
+                usersWithEmail.Add(user);
+                FoundEmails_List.Items.Refresh();
+              }
             }
 
             UpdateStatusLabel();
           }));
         }
       }
+    }
+
+    private bool DoesUserMatchCriterias(UserModel user) {
+      bool criteria = true;
+      if(!(bool)cb_IncludePrivateAccounts.IsChecked && user.isPrivate) {
+        criteria = false; 
+      }
+
+      if(!(bool)cb_IncludeBussinessAccounts.IsChecked && user.isBussiness) {
+        criteria = false;
+      }
+
+      if(!(bool)cb_IncludeVerifiedAccounts.IsChecked && user.isVerified) {
+        criteria = false;
+      }
+
+      bool doesUserHasPhone = (!string.IsNullOrEmpty(user.phoneCountryCode) && !string.IsNullOrEmpty(user.phoneNumber));
+      if((bool)cb_ShouldHavePhone.IsChecked && !doesUserHasPhone) {
+        criteria = false;
+      }
+
+      //TODO: Implement website and location checks.
+
+      return criteria;
     }
 
     private void Instagram_OnUserFetched(PartialUserModel[] user, string endCursor) {

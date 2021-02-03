@@ -69,12 +69,12 @@
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
-                    <CheckBox x:Name="cb_IncludePrivateAccounts" Grid.Row="0" Grid.Column="0" Content="Include private accounts" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="cb_IncludeBussinessAccounts" Grid.Row="0" Grid.Column="1" Content="Include bussiness accounts" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="cb_IncludeVerifiedAccounts" Grid.Row="0" Grid.Column="2" Content="Include verified accounts" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="cb_ShouldHavePhone" Grid.Row="1" Grid.Column="0" Content="Should have phone" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="cb_ShouldHaveWebsite" Grid.Row="1" Grid.Column="1" Content="Should have website" VerticalAlignment="Center"/>
-                    <CheckBox x:Name="cb_ShouldHaveLocation" Grid.Row="1" Grid.Column="2" Content="Should have location" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_IncludePrivateAccounts" IsChecked="False" Grid.Row="0" Grid.Column="0" Content="Include private accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_IncludeBussinessAccounts" IsChecked="True" Grid.Row="0" Grid.Column="1" Content="Include bussiness accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_IncludeVerifiedAccounts" IsChecked="True" Grid.Row="0" Grid.Column="2" Content="Include verified accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHavePhone" IsChecked="False" Grid.Row="1" Grid.Column="0" Content="Should have phone" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHaveWebsite" IsChecked="False" Grid.Row="1" Grid.Column="1" Content="Should have website" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHaveLocation" IsChecked="False" Grid.Row="1" Grid.Column="2" Content="Should have location" VerticalAlignment="Center"/>
                 </Grid>
             </GroupBox>
             <GroupBox Header="Status" Grid.Column="1" Grid.Row="0">
