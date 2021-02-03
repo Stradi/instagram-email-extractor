@@ -11,13 +11,13 @@
 
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="174.01"/>
-            <RowDefinition Height="174.01"/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="397"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0">
             <GroupBox Header="Extract from Post Likers">
@@ -28,33 +28,15 @@
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Content="Post URL"/>
                     <TextBox x:Name="tb_PostLikers_URL" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" />
-                    <Button x:Name="btn_PostLikers_Extract" Click="btn_PostLikers_Extract_Click" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Content="Start Extraction" Margin="10"/>
-
-                    <GroupBox Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="2" Header="Settings">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Column="0" Grid.Row="0" Content="How many likes you want to get?"/>
-                            <controls:NumberPicker x:Name="np_PostLikers_ExtractionCount" Grid.Column="1" Grid.Row="0"/>
-                            <CheckBox x:Name="cb_IncludeVerifiedAccounts" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" IsChecked="True">Include verified accounts</CheckBox>
-                            <CheckBox x:Name="cb_IncludePrivateAccounts" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" IsChecked="False">Include private accounts</CheckBox>
-                            <CheckBox x:Name="cb_ShouldHavePhoneNumber" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="False">Should have phone number</CheckBox>
-                            <CheckBox x:Name="cb_IncludeBussinessAccounts" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="True">Include bussiness accounts</CheckBox>
-                        </Grid>
-                    </GroupBox>
+                    <Button x:Name="btn_PostLikers_Extract" Grid.Column="2" Grid.Row="0" Click="btn_PostLikers_Extract_Click" VerticalAlignment="Center" Content="Start Extraction" Margin="10"/>
+                    
+                    <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Center" Content="Maximum extraction count"/>
+                    <controls:NumberPicker x:Name="np_PostLikers_ExtractionCount" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="10"/>
                 </Grid>
             </GroupBox>
         </Grid>
@@ -68,13 +50,39 @@
             <GroupBox Header="Extract from Location"></GroupBox>
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
-            <GroupBox Header="Found Emails">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Settings" Grid.Column="0" Grid.Row="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView x:Name="FoundEmails_List" Grid.Column="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox x:Name="cb_IncludePrivateAccounts" Grid.Row="0" Grid.Column="0" Content="Include private accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_IncludeBussinessAccounts" Grid.Row="0" Grid.Column="1" Content="Include bussiness accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_IncludeVerifiedAccounts" Grid.Row="0" Grid.Column="2" Content="Include verified accounts" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHavePhone" Grid.Row="1" Grid.Column="0" Content="Should have phone" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHaveWebsite" Grid.Row="1" Grid.Column="1" Content="Should have website" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="cb_ShouldHaveLocation" Grid.Row="1" Grid.Column="2" Content="Should have location" VerticalAlignment="Center"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Status" Grid.Column="1" Grid.Row="0">
+                <Label x:Name="lbl_ExtractionStatus" Content="Extraction Status"/>
+            </GroupBox>
+            <GroupBox Header="Found Emails" Grid.Row="1" Grid.ColumnSpan="2">
+                <Grid>
+                    <ListView x:Name="FoundEmails_List" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                         <ListView.View>
                             <GridView>
                                 <GridView.ColumnHeaderContainerStyle>
@@ -95,9 +103,6 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Grid Grid.Column="1">
-                        <Label x:Name="lbl_ExtractionStatus" Content="Extraction Status"/>
-                    </Grid>
                 </Grid>
             </GroupBox>
         </Grid>
