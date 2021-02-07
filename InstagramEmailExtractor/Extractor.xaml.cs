@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Threading;
@@ -31,7 +32,7 @@ namespace InstagramEmailExtractor {
       foundUsers = 0;
       extractedUsers = 0;
 
-      extractionThreadCount = 5;
+      extractionThreadCount = 2;
       extractionThreads = new Thread[extractionThreadCount];
       InitiateExtractionThreads(extractionThreadCount);
     }
@@ -47,7 +48,13 @@ namespace InstagramEmailExtractor {
     private async void StartEmailExtraction() {
       while(true) {
         if(fetchedUsers.Count > 0) {
-          UserModel user = await MainWindow.Instagram.ExtractUser(fetchedUsers.Dequeue().userId);
+          UserModel user = null;
+          try {
+            user = await MainWindow.Instagram.ExtractUser(fetchedUsers.Dequeue().userId);
+          } catch(Exception e) {
+            SaveToFile(string.Format("crash_{0}.csv", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")), usersWithEmail.ToArray());
+            continue;
+          }
           extractedUsers++;
 
           await this.Dispatcher.BeginInvoke((Action)(() => {
@@ -61,6 +68,7 @@ namespace InstagramEmailExtractor {
 
             UpdateStatusLabel();
           }));
+          Thread.Sleep(1000);
         }
       }
     }
@@ -121,6 +129,31 @@ namespace InstagramEmailExtractor {
       //If throws Json exception that probably means
       //account is logged out or requires checkpoint (sms or email).
       await MainWindow.Instagram.GetPostLikers(shortcode, totalExtractions);
+    }
+
+    private void btn_PostLikers_SaveFoundEmails(object sender, RoutedEventArgs e) {
+      UserModel[] usersToSave = usersWithEmail.ToArray();
+      usersWithEmail.Clear();
+      SaveToFile("extracted_users.csv", usersToSave);
+    }
+
+    private void SaveToFile(string fileName, UserModel[] users) {
+      StreamWriter sw = new StreamWriter(fileName, true);
+      for(int i = 0; i < users.Length; i++) {
+        UserModel u = users[i];
+        string csv = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}",
+          u.username, u.fullName,
+          string.IsNullOrEmpty(u.email) ? "" : u.email,
+          u.follower, u.following, u.mediaCount,
+          u.isPrivate, u.isBussiness, u.isVerified,
+          string.IsNullOrEmpty(u.phoneCountryCode) ? "" : u.phoneCountryCode,
+          string.IsNullOrEmpty(u.phoneNumber) ? "" : u.phoneNumber);
+        
+        sw.WriteLine(csv);
+        sw.Flush();
+      }
+
+      sw.Close();
     }
 
     private void UpdateStatusLabel() {

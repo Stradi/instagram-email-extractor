@@ -82,7 +82,11 @@
             </GroupBox>
             <GroupBox Header="Found Emails" Grid.Row="1" Grid.ColumnSpan="2">
                 <Grid>
-                    <ListView x:Name="FoundEmails_List" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Grid.Column="0" x:Name="FoundEmails_List" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                         <ListView.View>
                             <GridView>
                                 <GridView.ColumnHeaderContainerStyle>
@@ -103,6 +107,7 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
+                    <Button Grid.Column="1" Click="btn_PostLikers_SaveFoundEmails" Content="Save Extracted Emails" Margin="12,75"/>
                 </Grid>
             </GroupBox>
         </Grid>
