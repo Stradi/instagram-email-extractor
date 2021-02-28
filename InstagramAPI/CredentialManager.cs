@@ -43,5 +43,9 @@ namespace InstagramAPI {
 
       return null;
     }
+
+    public CredentialModel FindWithUsername(string username) {
+      return credentials.Find(cred => cred.username == username);
+    }
   }
 }
