@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Collections.Generic;
 
 using System.IO;
 
@@ -26,7 +17,9 @@ namespace InstagramEmailExtractor {
     private string CRED_PATH = string.Format("{0}/{1}", DATA_DIRECTORY, CRED_FILENAME); 
 
     private List<Credential> credentialItems;
-    private int idCounter;
+    private List<Proxy> proxyItems;
+    private int credentialIdCounter;
+    private int proxyIdCounter;
 
     public CredentialManager() {
       InitializeComponent();
@@ -34,7 +27,11 @@ namespace InstagramEmailExtractor {
       credentialItems = new List<Credential>();
       CredentialList.ItemsSource = credentialItems;
 
-      idCounter = 0;
+      proxyItems = new List<Proxy>();
+      ProxyList.ItemsSource = proxyItems;
+
+      credentialIdCounter = 0;
+      proxyIdCounter = 0;
       LoadCredentials();
     }
 
@@ -66,7 +63,7 @@ namespace InstagramEmailExtractor {
     }
 
     private void btn_AddCredential_AddOne(object sender, RoutedEventArgs e) {
-      if(!ValidateTextboxes(tb_AddCredential_Username, tb_AddCredential_Password)) {
+      if(!FormHelpers.ValidateTextboxes(tb_AddCredential_Username, tb_AddCredential_Password)) {
         return;
       }
 
@@ -75,7 +72,7 @@ namespace InstagramEmailExtractor {
 
       AddNewCredential(username, password);
 
-      ResetTextboxColors(tb_AddCredential_Username, tb_AddCredential_Password);
+      FormHelpers.ResetTextboxColors(tb_AddCredential_Username, tb_AddCredential_Password);
       tb_AddCredential_Username.Text = "";
       tb_AddCredential_Password.Text = "";
     }
@@ -85,7 +82,16 @@ namespace InstagramEmailExtractor {
     }
 
     private void btn_AddProxy_AddOne(object sender, RoutedEventArgs e) {
-    
+      if(!FormHelpers.ValidateTextboxes(tb_AddProxy_Host)) {
+        return;
+      }
+
+      string host = tb_AddProxy_Host.Text;
+
+      AddNewProxy(host);
+
+      FormHelpers.ResetTextboxColors(tb_AddProxy_Host);
+      tb_AddProxy_Host.Text = "";
     }
 
     private void btn_AddProxy_Load(object sender, RoutedEventArgs e) {
@@ -101,7 +107,7 @@ namespace InstagramEmailExtractor {
 
       Credential.StatusMessages status = !loadedFromFile ? Credential.StatusMessages.NewlyAdded : Credential.StatusMessages.LoadedFromFile;
       Credential c = new Credential() {
-        Id = idCounter++,
+        Id = credentialIdCounter++,
         Username = username,
         Password = password,
         Status = status
@@ -111,7 +117,33 @@ namespace InstagramEmailExtractor {
       CredentialList.Items.Refresh();
 
       if(!loadedFromFile) {
-        //await LoginCredential(c);
+        await LoginCredential(c);
+      }
+    }
+
+    //TODO: This function blocks the UI thread. Make IsProxyWorking and GetIP functions async.
+    private void AddNewProxy(string host) {
+      bool alreadyExists = proxyItems.Where(cred => cred.Host == host).ToArray().Length > 0;
+      if(alreadyExists) {
+        //Log error
+        return;
+      }
+
+      Proxy.StatusMessages status = Proxy.StatusMessages.NewlyAdded;
+      Proxy p = new Proxy() {
+        Id = proxyIdCounter++,
+        Host = host,
+        Status = status
+      };
+
+      proxyItems.Add(p);
+      ProxyList.Items.Refresh();
+
+      bool isProxyWorking = MainWindow.Instagram.webProxy.AddProxy(new InstagramAPI.Models.ProxyModel(host));
+      if(isProxyWorking) {
+        p.Status = Proxy.StatusMessages.Working;
+      } else {
+        p.Status = Proxy.StatusMessages.NotWorking;
       }
     }
 
@@ -134,24 +166,6 @@ namespace InstagramEmailExtractor {
       } else {
         ChangeCredentialStatus(cred, Credential.StatusMessages.Error);
         //Username or password is wrong.
-      }
-    }
-
-    private bool ValidateTextboxes(params TextBox[] inputs) {
-      bool hasErrors = false;
-      for(int i = 0; i < inputs.Length; i++) {
-        if(string.IsNullOrEmpty(inputs[i].Text)) {
-          inputs[i].BorderBrush = Brushes.Red;
-          hasErrors = true;
-        }
-      }
-
-      return !hasErrors;
-    }
-
-    private void ResetTextboxColors(params TextBox[] inputs) {
-      for(int i = 0; i < inputs.Length; i++) {
-        inputs[i].BorderBrush = Brushes.LightGray;
       }
     }
 

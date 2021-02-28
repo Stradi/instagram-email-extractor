@@ -37,6 +37,8 @@ namespace InstagramAPI.Responses {
 
       if(userObject["is_bussiness"] != null) {
         user.isBussiness = (bool)userObject["is_bussiness"];
+      } else {
+        user.isBussiness = false;
       }
       
       this.User = user;

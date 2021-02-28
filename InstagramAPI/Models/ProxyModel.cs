@@ -1,11 +1,9 @@
 namespace InstagramAPI.Models {
   public class ProxyModel {
-    public string ipAddress;
-    public int port;
+    public string host;
 
-    public ProxyModel(string ipAddress, int port) {
-      this.ipAddress = ipAddress;
-      this.port = port;
+    public ProxyModel(string host) {
+      this.host = host;
     }
   }
 }
